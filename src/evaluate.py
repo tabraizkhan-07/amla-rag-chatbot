@@ -1,8 +1,17 @@
 """Evaluation Script for AMLA 2010 RAG Chatbot (Task 11 Evaluation)."""
 
 import json
+import logging
 import requests
 import pandas as pd
+
+# Configure logger
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
 
 # Define the 15 Test Questions updated for AMLA 2010
 TEST_DATASET = [
@@ -111,7 +120,7 @@ def run_evaluation():
     results = []
     passed_count = 0
 
-    print("🚀 Starting Automated Evaluation of 15 AMLA Test Questions...\n")
+    logger.info("🚀 Starting Automated Evaluation of 15 AMLA Test Questions...\n")
 
     for item in TEST_DATASET:
         qid = item["id"]
@@ -154,20 +163,20 @@ def run_evaluation():
                     "Passed?": "✅" if passed else "❌"
                 })
             else:
-                print(f"❌ Error for Q{qid}: HTTP {response.status_code}")
+                logger.error(f"❌ Error for Q{qid}: HTTP {response.status_code}")
         except Exception as e:
-            print(f"❌ Connection error on Q{qid}: {e}")
+            logger.error(f"❌ Connection error on Q{qid}: {e}")
 
     # Display Report Summary
     pass_rate = (passed_count / len(TEST_DATASET)) * 100
-    print("\n" + "="*80)
-    print(f"📊 EVALUATION SUMMARY: {passed_count}/{len(TEST_DATASET)} Passed ({pass_rate:.1f}% Pass Rate)")
-    print("="*80 + "\n")
+    logger.info("=" * 80)
+    logger.info(f"📊 EVALUATION SUMMARY: {passed_count}/{len(TEST_DATASET)} Passed ({pass_rate:.1f}% Pass Rate)")
+    logger.info("=" * 80 + "\n")
 
     # Export to CSV for documentation/submission
     df = pd.DataFrame(results)
     df.to_csv("eval_results.csv", index=False, encoding="utf-8-sig")
-    print("📁 Detailed report saved to 'eval_results.csv'")
+    logger.info("📁 Detailed report saved to 'eval_results.csv'")
 
 if __name__ == "__main__":
     run_evaluation()
